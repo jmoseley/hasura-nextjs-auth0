@@ -1,4 +1,4 @@
-![Hanja](assets/hanja_logo.png)
+![Hanja](docs/assets/hanja_logo.png)
 
 ### Repo for quick start with [**Ha***sura*](https://hasura.io), [**N***ext***J***s*](https://nextjs.org/), [**A***uth0*](https://www.auth0.com)
 
