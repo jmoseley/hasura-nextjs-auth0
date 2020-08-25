@@ -1,6 +1,16 @@
-actions: []
+actions:
+- name: insert_new_todo
+  definition:
+    kind: synchronous
+    handler: '{{ACTION_ENDPOINT}}/insert-new-todo'
+  permissions:
+  - role: user
 custom_types:
   enums: []
-  input_objects: []
-  objects: []
+  input_objects:
+  - name: SampleInput
+  objects:
+  - name: InsertNewTodoOutput
+  - name: insert_new_todo_output
+  - name: SampleOutput
   scalars: []
