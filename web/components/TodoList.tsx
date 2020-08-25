@@ -12,6 +12,8 @@ const TodoList: FunctionComponent = () => {
     console.error(error);
   }
 
+  console.log('todosLoading', todosLoading, data);
+
   return (
     <div>
       {!todosLoading && error && <div>{error}</div>}
