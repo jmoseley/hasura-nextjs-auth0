@@ -164,25 +164,29 @@ const main = async () => {
       async () => {
         capcon.startIntercept(process.stderr, () => null);
         capcon.startIntercept(process.stdout, () => null);
-        await deploy({
-          input_file: '../auth0/tenant', // Input file for directory
-          base_path: process.cwd(),
-          config: {
-            AUTH0_DOMAIN: auth0Domain,
-            AUTH0_CLIENT_SECRET: auth0CliClientSecret,
-            AUTH0_CLIENT_ID: auth0CliClientId,
-            AUTH0_ALLOW_DELETE: false,
-            AUTH0_KEYWORD_REPLACE_MAPPINGS: {
-              LOGO_URL: logoUrl,
-              APP_URL: appUrl,
-              HASURA_ENDPOINT: hasuraEndpoint,
-              ADMIN_SECRET: adminSecret
-            }
-          }, // Option to sent in json as object
-          env: false, // Disallow env variable mappings from process.env
-        });
-        capcon.stopIntercept(process.stderr);
-        capcon.stopIntercept(process.stdout);
+        try {
+          await deploy({
+            input_file: '../auth0/tenant', // Input file for directory
+            base_path: process.cwd(),
+            config: {
+              AUTH0_DOMAIN: auth0Domain,
+              AUTH0_CLIENT_SECRET: auth0CliClientSecret,
+              AUTH0_CLIENT_ID: auth0CliClientId,
+              AUTH0_ALLOW_DELETE: false,
+              AUTH0_KEYWORD_REPLACE_MAPPINGS: {
+                LOGO_URL: logoUrl,
+                APP_URL: appUrl,
+                HASURA_ENDPOINT: hasuraEndpoint,
+                ADMIN_SECRET: adminSecret,
+                PROJECT_NAME: projectName,
+              }
+            }, // Option to sent in json as object
+            env: false, // Disallow env variable mappings from process.env
+          });
+        } finally {
+          capcon.stopIntercept(process.stderr);
+          capcon.stopIntercept(process.stdout);
+        }
 
         // Need to query the management API to get the ClientID of the web app that was just created.
         const auth0ManagementApi = new ManagementClient({

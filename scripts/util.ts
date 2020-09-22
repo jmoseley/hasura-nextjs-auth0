@@ -28,9 +28,16 @@ export const executeCommand = (cmd: string, env: SpawnOptions['env']) => {
       reject(err);
     })
     child.once('exit', (code, signal) => {
-      resolve({
-        code, signal, stdout: stdout.toString(), stderr: stderr.toString()
-      });
+      if (code === 0) {
+        resolve({
+          code,
+          signal,
+          stdout: stdout.toString(),
+          stderr: stderr.toString(),
+        });
+      } else {
+        reject(`cmd exited with non-zero code (${code}) and signal '${signal}'`);
+      }
     });
   });
 };
