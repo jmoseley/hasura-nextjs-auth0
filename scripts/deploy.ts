@@ -15,6 +15,7 @@ import { randomStringFilter, executeCommand, writeJsonFile, spinOn } from './uti
 interface Config {
   projectName: string,
   projectSlug: string,
+  herokuTeam: string,
   auth0Domain: string,
   auth0CliClientId: string,
   auth0CliClientSecret: string,
@@ -79,6 +80,12 @@ const main = async () => {
       default: `${appUrl}/logo.png`
     }], existingConfig);
 
+    const { herokuTeam } = await inquirer.prompt({
+      name: 'herokuTeam',
+      type: 'input',
+      message: 'Heroku Team Name (optional)',
+    }, existingConfig);
+
     console.log(chalk.blue(`Please enter Hasura secrets`));
     const { adminSecret, eventSecret, actionSecret } = await inquirer.prompt([{
       name: 'adminSecret',
@@ -120,6 +127,7 @@ const main = async () => {
           await writeJsonFile(configFilePath, {
             projectName,
             projectSlug,
+            herokuTeam,
             auth0Domain,
             auth0CliClientId,
             auth0CliClientSecret,
@@ -138,7 +146,15 @@ const main = async () => {
     await spinOn(
       `Deploying Hasura...`,
       `Hasura deployed.`,
-      async () => await executeCommand(`yarn deploy-hasura-heroku`, { PROJECT_SLUG: projectSlug, EVENT_SECRET: eventSecret, APP_URL: appUrl, ACTION_SECRET: actionSecret, ADMIN_SECRET: adminSecret, AUTH0_URL: auth0Url })
+      async () => await executeCommand(`yarn deploy-hasura-heroku`, {
+        PROJECT_SLUG: projectSlug,
+        HEROKU_TEAM: herokuTeam,
+        EVENT_SECRET: eventSecret,
+        APP_URL: appUrl,
+        ACTION_SECRET: actionSecret,
+        ADMIN_SECRET: adminSecret,
+        AUTH0_URL: auth0Url
+      })
     );
 
     let auth0WebClientId: string | undefined = undefined;

@@ -1,9 +1,13 @@
 #!/bin/sh
-set -e
+set -ex
 
 cd ..
 
 yarn
+
+if [ -n "$HEROKU_TEAM" ]; then
+  TEAM_OPTS="--team=$HEROKU_TEAM"
+fi
 
 set +e
 if yarn heroku whoami ; then
@@ -14,7 +18,7 @@ else
 fi
 set -e
 # TODO: Use manifest for app definition. Was not able to get this to work.
-yarn heroku apps:create -s container --addons=heroku-postgresql $PROJECT_SLUG && true
+yarn heroku apps:create -s container $TEAM_OPTS --addons=heroku-postgresql $PROJECT_SLUG && true
 yarn heroku git:remote -a $PROJECT_SLUG
 
 # TODO: Use .env
