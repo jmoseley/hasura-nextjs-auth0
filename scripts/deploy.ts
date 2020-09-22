@@ -27,7 +27,7 @@ interface Config {
 const main = async () => {
   try {
     const configFilePath = path.join(process.cwd(), '../hanja-config.prod.json');
-    let existingConfig: Config;
+    let existingConfig: Config = {} as Config;
     if (fs.existsSync(configFilePath)) {
       existingConfig = JSON.parse(await new Promise<string>((resolve, reject) => {
         fs.readFile(configFilePath, (err, value) => {
