@@ -1,0 +1,36 @@
+{
+  "name": "auth0",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "deploy-auth0": "yarn && ./deploy-auth0.ts",
+    "deploy-hasura-heroku": "./deploy-hasura-heroku.sh",
+    "deploy-app-vercel": "./deploy-app-vercel.sh",
+    "deploy": "./deploy.ts"
+  },
+  "dependencies": {
+    "@supercharge/strings": "^1.12.0",
+    "auth0": "^2.28.0",
+    "auth0-deploy-cli": "^5.1.5",
+    "capture-console": "^1.0.1",
+    "chalk": "^4.1.0",
+    "clui": "^0.3.6",
+    "inquirer": "^7.3.3",
+    "lodash.kebabcase": "^4.1.1",
+    "tempfile": "^3.0.0",
+    "yargs": "^16.0.3"
+  },
+  "devDependencies": {
+    "@types/auth0": "^2.20.8",
+    "@types/capture-console": "^1.0.0",
+    "@types/chalk": "^2.2.0",
+    "@types/clui": "^0.3.0",
+    "@types/inquirer": "^7.3.1",
+    "@types/lodash.kebabcase": "^4.1.6",
+    "@types/shelljs": "^0.8.8",
+    "@types/yargs": "^15.0.5",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.2"
+  }
+}

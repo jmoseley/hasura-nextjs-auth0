@@ -19,18 +19,15 @@
 - [x] Implement action backend that integrates with Hasura
 - [x] Implement event backend
 - [ ] Write docs for getting started
-- [ ] Provide guide or helper for building Auth0 application
+- [ ] Docs for dev workflow
+- [x] Provide guide or helper for building Auth0 application
 - [ ] Provide docs or helper for deploying
-  - [ ] Heroku
+  - [x] Heroku
   - [ ] Render
-  - [ ] Vercel
-  - [ ] Others?
-- [ ] Make the app look pretty
+  - [x] Vercel
+  - [ ] Digital Ocean
+  - [ ] AWS
+  - [ ] Hasura Cloud
+- [ ] Docs for deploying staging/testing environments
+- [ ] Make the demo app look pretty
 - [ ] Leverage create-nextjs-app (or something similar, like yo) for helping people get started easily
-
-## Getting Started
-
-1. Create Auth0 Application
-   1. SPA
-   2. [Rule & API](https://hasura.io/docs/1.0/graphql/manual/guides/integrations/auth0-jwt.html)
-   3. [Rule for Syncing Users](https://auth0.com/blog/building-a-collaborative-todo-app-with-realtime-graphql-using-hasura/)
