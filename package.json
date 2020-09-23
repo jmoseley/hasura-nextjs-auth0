@@ -7,7 +7,7 @@
   "license": "MITNFA",
   "scripts": {
     "lint": "eslint '*/**/*.{js,ts,tsx,md,json}' --quiet --fix",
-    "hasura-console": "cd scripts && yarn hasura-console",
+    "hasura": "cd scripts && yarn hasura",
     "deploy": "cd scripts && yarn deploy"
   },
   "devDependencies": {
