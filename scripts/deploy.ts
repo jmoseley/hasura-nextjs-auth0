@@ -119,15 +119,22 @@ const main = async () => {
       }
     }
 
+    const hasuraBaseUrl = `https://${projectSlug}.herokuapp.com`;
+    const hasuraEndpoint = `${hasuraBaseUrl}/v1/graphql`;
+    const auth0Url = `https://${auth0Domain}`;
+
     if (shouldWriteConfig) {
       await spinOn(
         `Writing data to ${configFilePath}...`,
         `Wrote config to ${configFilePath}. This file contains secrets, and should be kept somewhere safe. However, it should NOT be committed to your repo, put it somewhere else.`,
         async () => {
           await writeJsonFile(configFilePath, {
+            appUrl,
             projectName,
             projectSlug,
             herokuTeam,
+            hasuraEndpoint,
+            hasuraBaseUrl,
             auth0Domain,
             auth0CliClientId,
             auth0CliClientSecret,
@@ -138,9 +145,6 @@ const main = async () => {
           });
         });
     }
-
-    const hasuraEndpoint = `https://${projectSlug}.herokuapp.com/v1/graphql`;
-    const auth0Url = `https://${auth0Domain}`;
 
     // TODO: Programmatic usage of the Heroku cli.
     await spinOn(
