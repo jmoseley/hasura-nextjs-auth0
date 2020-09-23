@@ -3,6 +3,11 @@ set -e
 
 cd ../
 
+# TODO: Figure out why this does not work when building with vercel. We shouldn't have to do this first.
+cd ./app
+yarn generate
+cd ..
+
 if vercel whoami 2>&1 | grep "The specified token is not valid" ; then
   vercel login
 else
