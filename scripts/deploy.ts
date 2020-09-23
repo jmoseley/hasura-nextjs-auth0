@@ -10,7 +10,7 @@ import { ManagementClient } from 'auth0';
 import capcon from 'capture-console';
 import tempfile from 'tempfile';
 
-import { randomStringFilter, executeCommand, writeJsonFile, spinOn } from './util';
+import { randomStringFilter, executeCommand, writeJsonFile, spinOn, ExecError } from './util';
 
 interface Config {
   projectName: string,
@@ -244,7 +244,17 @@ const main = async () => {
       }
     );
   } catch (error) {
-    console.error(`Got an error. ${error.message}`);
+    console.error(`Got an error.`);
+
+    if (error instanceof ExecError) {
+      console.error(`Exec error. Code: ${error.code} Signal: ${error.signal}`);
+      console.error(`stdout\n`, error.stdout);
+      console.error(`stderr\n`, error.stderr);
+    } else if (error instanceof Error) {
+      console.error(error.message);
+    } else {
+      console.error(error);
+    }
   }
 }
 

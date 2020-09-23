@@ -4,6 +4,12 @@ import fs from 'fs';
 import { Spinner } from 'clui';
 import chalk from 'chalk';
 
+export class ExecError extends Error {
+  constructor(public code: number, public signal: NodeJS.Signals, public stdout: string, public stderr: string) {
+    super(`cmd exited with non-zero code (${code}) and signal '${signal}'`);
+  }
+}
+
 export const executeCommand = (cmd: string, env: SpawnOptions['env']) => {
   return new Promise<{ stdout: string, stderr: string, code: number, signal: string }>((resolve, reject) => {
     const child = spawn(cmd, {
@@ -36,7 +42,7 @@ export const executeCommand = (cmd: string, env: SpawnOptions['env']) => {
           stderr: stderr.toString(),
         });
       } else {
-        reject(`cmd exited with non-zero code (${code}) and signal '${signal}'`);
+        reject(new ExecError(code, signal, stdout.toString(), stderr.toString()));
       }
     });
   });
