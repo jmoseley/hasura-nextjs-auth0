@@ -34,7 +34,7 @@ generates:
       withComponent: false
       exportFragmentSpreadSubTypes: true
       documentMode: graphQLTag
-  api/generated/graphql.ts:
+  api-lib/generated/graphql.ts:
     documents: 'api-lib/graphql/**/*.*.graphql'
     plugins:
       - add:
