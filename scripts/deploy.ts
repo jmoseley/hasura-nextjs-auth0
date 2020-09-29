@@ -11,7 +11,6 @@ import capcon from 'capture-console';
 import tempfile from 'tempfile';
 
 import { randomStringFilter, executeCommand, writeJsonFile, spinOn, ExecError } from './util';
-import { config } from 'shelljs';
 
 interface Config {
   appUrl: string,
@@ -23,7 +22,6 @@ interface Config {
   auth0Domain: string,
   auth0CliClientId: string,
   auth0CliClientSecret: string,
-  auth0WebClientId: string,
   logoUrl: string,
   adminSecret: string,
   eventSecret: string,
@@ -159,22 +157,7 @@ const main = async () => {
         `Writing data to ${configFilePath}...`,
         `Wrote config to ${configFilePath}. This file contains secrets, and should be kept somewhere safe. However, it should NOT be committed to your repo, put it somewhere else.`,
         async () => {
-          await writeJsonFile(configFilePath, {
-            appUrl,
-            projectName,
-            projectSlug,
-            herokuTeam,
-            hasuraEndpoint,
-            hasuraBaseUrl,
-            auth0Domain,
-            auth0CliClientId,
-            auth0CliClientSecret,
-            logoUrl,
-            adminSecret,
-            eventSecret,
-            actionSecret,
-            domainName,
-          });
+          await writeJsonFile(configFilePath, updatedConfig);
         });
     }
 
@@ -252,22 +235,12 @@ const main = async () => {
       }
     );
 
-    updatedConfig.auth0WebClientId = auth0WebClientId;
-    if (shouldWriteConfig) {
-      await spinOn(
-        `Writing data to ${configFilePath}...`,
-        `Wrote config to ${configFilePath}. This file contains secrets, and should be kept somewhere safe. However, it should NOT be committed to your repo, put it somewhere else.`,
-        async () => {
-          await writeJsonFile(configFilePath, updatedConfig);
-        });
-    }
-
     const vercelConfigFile = tempfile('.json');
     await spinOn(
       `Writing vercel config...`,
       `Wrote vercel config to temp file.`,
       async () => {
-        await writeJsonFile(vercelConfigFile, buildVercelProdConfig(updatedConfig));
+        await writeJsonFile(vercelConfigFile, buildVercelProdConfig({ ...updatedConfig, auth0ClientId: auth0WebClientId }));
       }
     );
 
@@ -305,7 +278,7 @@ Please follow directions at https://vercel.com/jmoseley/${projectSlug}/settings/
 
 main();
 
-function buildVercelProdConfig(config: Config) {
+function buildVercelProdConfig(config: Config & { auth0ClientId: string }) {
   const vercelConfig: Record<string, unknown> = {
     "version": 2,
     "env": {
@@ -315,7 +288,7 @@ function buildVercelProdConfig(config: Config) {
       "APP_ROOT": config.appUrl,
       "NEXT_PUBLIC_APP_ROOT": config.appUrl,
       "NEXT_PUBLIC_AUTH0_DOMAIN": config.auth0Domain,
-      "NEXT_PUBLIC_AUTH0_CLIENT_ID": config.auth0WebClientId,
+      "NEXT_PUBLIC_AUTH0_CLIENT_ID": config.auth0ClientId,
     },
     "build": {
       "env": {
@@ -325,7 +298,7 @@ function buildVercelProdConfig(config: Config) {
         "APP_ROOT": config.appUrl,
         "NEXT_PUBLIC_APP_ROOT": config.appUrl,
         "NEXT_PUBLIC_AUTH0_DOMAIN": config.auth0Domain,
-        "NEXT_PUBLIC_AUTH0_CLIENT_ID": config.auth0WebClientId,
+        "NEXT_PUBLIC_AUTH0_CLIENT_ID": config.auth0ClientId,
       }
     }
   };
