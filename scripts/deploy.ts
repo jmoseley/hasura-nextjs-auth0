@@ -180,7 +180,7 @@ const main = async () => {
         ACTION_SECRET: actionSecret,
         ADMIN_SECRET: adminSecret,
         AUTH0_URL: auth0Url,
-        DOMAIN_NAME: graphqlDomainName,
+        DOMAIN_NAME: graphqlDomainName || '',
       })
     );
 
