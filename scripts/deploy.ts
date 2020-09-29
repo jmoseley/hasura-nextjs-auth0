@@ -27,6 +27,7 @@ interface Config {
   eventSecret: string,
   actionSecret: string,
   domainName: string | null,
+  graphqlDomainName: string | null,
 }
 
 const main = async () => {
@@ -62,12 +63,17 @@ const main = async () => {
       }
     }
 
-    const { domainName } = await inquirer.prompt({
+    const { domainName, graphqlDomainName } = await inquirer.prompt([{
       name: 'domainName',
       type: 'input',
       message: 'Domain Name for web app (optional)',
       default: null,
-    }, existingConfig);
+    }, {
+      name: 'graphqlDomainName',
+      type: 'input',
+      message: 'Domain Name for graphql api (optional)',
+      default: null,
+    }], existingConfig);
 
     const appUrl = `https://${domainName || `${projectSlug}.vercel.app`}`;
 
@@ -130,7 +136,7 @@ const main = async () => {
       }
     }
 
-    const hasuraBaseUrl = `https://${projectSlug}.herokuapp.com`;
+    const hasuraBaseUrl = `https://${graphqlDomainName ? graphqlDomainName : `${projectSlug}.herokuapp.com`}`;
     const hasuraEndpoint = `${hasuraBaseUrl}/v1/graphql`;
     const auth0Url = `https://${auth0Domain}`;
 
@@ -150,6 +156,7 @@ const main = async () => {
       eventSecret,
       actionSecret,
       domainName,
+      graphqlDomainName,
     }
 
     if (shouldWriteConfig) {
@@ -172,7 +179,8 @@ const main = async () => {
         APP_URL: appUrl,
         ACTION_SECRET: actionSecret,
         ADMIN_SECRET: adminSecret,
-        AUTH0_URL: auth0Url
+        AUTH0_URL: auth0Url,
+        DOMAIN_NAME: graphqlDomainName,
       })
     );
 

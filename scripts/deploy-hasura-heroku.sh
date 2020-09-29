@@ -30,6 +30,14 @@ yarn heroku config:set HASURA_GRAPHQL_ADMIN_SECRET=$ADMIN_SECRET
 yarn heroku config:set HASURA_GRAPHQL_JWT_SECRET='{ "jwk_url": "'$AUTH0_URL'/.well-known/jwks.json" }'
 yarn heroku config:set HASURA_GRAPHQL_UNAUTHORIZED_ROLE=anonymous
 
+if [ -n "$DOMAIN_NAME" ]; then
+  echo "Setting domain alias"
+  if [ -z "$(heroku domains -a $PROJECT_SLUG 2>&1 | grep $DOMAIN_NAME)" ]; then
+    echo "Domain not registered to account, adding"
+    heroku domains:add -a $PROJECT_SLUG $DOMAIN_NAME
+  fi
+fi
+
 git push heroku $(git rev-parse --abbrev-ref HEAD):master
 
 HASURA_ENDPOINT=$(yarn heroku apps:info | grep "Web URL" | cut -d":" -f2,3 | sed 's/^ *//g')
