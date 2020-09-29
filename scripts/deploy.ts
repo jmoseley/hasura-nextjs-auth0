@@ -11,18 +11,24 @@ import capcon from 'capture-console';
 import tempfile from 'tempfile';
 
 import { randomStringFilter, executeCommand, writeJsonFile, spinOn, ExecError } from './util';
+import { config } from 'shelljs';
 
 interface Config {
+  appUrl: string,
   projectName: string,
   projectSlug: string,
+  hasuraEndpoint: string,
+  hasuraBaseUrl: string,
   herokuTeam: string,
   auth0Domain: string,
   auth0CliClientId: string,
   auth0CliClientSecret: string,
+  auth0WebClientId: string,
   logoUrl: string,
   adminSecret: string,
   eventSecret: string,
   actionSecret: string,
+  domainName: string | null,
 }
 
 const main = async () => {
@@ -45,8 +51,6 @@ const main = async () => {
     const { projectName } = await inquirer.prompt({ type: 'input', name: 'projectName', message: 'Project Name', }, existingConfig);
     const { projectSlug } = await inquirer.prompt({ type: 'input', name: 'projectSlug', message: 'Project Slug', default: ldKebabCase(projectName) }, existingConfig);
 
-    const appUrl = `https://${projectSlug}.vercel.app`;
-
     if (!existingConfig.auth0CliClientId) {
       const { auth0Setup } = await inquirer.prompt({
         type: 'confirm',
@@ -59,6 +63,15 @@ const main = async () => {
         process.exit(1);
       }
     }
+
+    const { domainName } = await inquirer.prompt({
+      name: 'domainName',
+      type: 'input',
+      message: 'Domain Name for web app (optional)',
+      default: null,
+    }, existingConfig);
+
+    const appUrl = `https://${domainName || `${projectSlug}.vercel.app`}`;
 
     console.log(chalk.blue(`Please enter Auth0 data`));
     const { auth0Domain, auth0CliClientId, auth0CliClientSecret, logoUrl } = await inquirer.prompt([{
@@ -123,6 +136,24 @@ const main = async () => {
     const hasuraEndpoint = `${hasuraBaseUrl}/v1/graphql`;
     const auth0Url = `https://${auth0Domain}`;
 
+    const updatedConfig: Config = {
+      ...existingConfig,
+      appUrl,
+      projectName,
+      projectSlug,
+      herokuTeam,
+      hasuraEndpoint,
+      hasuraBaseUrl,
+      auth0Domain,
+      auth0CliClientId,
+      auth0CliClientSecret,
+      logoUrl,
+      adminSecret,
+      eventSecret,
+      actionSecret,
+      domainName,
+    }
+
     if (shouldWriteConfig) {
       await spinOn(
         `Writing data to ${configFilePath}...`,
@@ -142,6 +173,7 @@ const main = async () => {
             adminSecret,
             eventSecret,
             actionSecret,
+            domainName,
           });
         });
     }
@@ -220,30 +252,39 @@ const main = async () => {
       }
     );
 
+    updatedConfig.auth0WebClientId = auth0WebClientId;
+    if (shouldWriteConfig) {
+      await spinOn(
+        `Writing data to ${configFilePath}...`,
+        `Wrote config to ${configFilePath}. This file contains secrets, and should be kept somewhere safe. However, it should NOT be committed to your repo, put it somewhere else.`,
+        async () => {
+          await writeJsonFile(configFilePath, updatedConfig);
+        });
+    }
+
     const vercelConfigFile = tempfile('.json');
     await spinOn(
       `Writing vercel config...`,
       `Wrote vercel config to temp file.`,
       async () => {
-        await writeJsonFile(vercelConfigFile, buildVercelProdConfig({
-          hasuraEndpoint,
-          adminSecret,
-          appUrl,
-          auth0Domain,
-          auth0ClientId: auth0WebClientId
-        }));
+        await writeJsonFile(vercelConfigFile, buildVercelProdConfig(updatedConfig));
       }
     );
 
     await spinOn(
       `Deploying Vercel app...`,
-      `Done deploying Vercel app`,
+      `Done deploying Vercel app. ${domainName
+        ? `The domain (${domainName}) has been set as an alias for the project.
+Please follow directions at https://vercel.com/jmoseley/${projectSlug}/settings/domains to ensure it is properly configured.`
+        : ''
+      }`,
       async () => {
         await executeCommand(`yarn deploy-app-vercel`, {
           VERCEL_CONFIG_FILE: vercelConfigFile,
           PROJECT_SLUG: projectSlug,
           HASURA_ENDPOINT: hasuraEndpoint,
           HASURA_ADMIN_SECRET: adminSecret,
+          DOMAIN_NAME: domainName,
         });
       }
     );
@@ -264,8 +305,8 @@ const main = async () => {
 
 main();
 
-function buildVercelProdConfig(config: { hasuraEndpoint: string, adminSecret: string, appUrl: string, auth0Domain: string, auth0ClientId: string }) {
-  return {
+function buildVercelProdConfig(config: Config) {
+  const vercelConfig: Record<string, unknown> = {
     "version": 2,
     "env": {
       "NEXT_PUBLIC_HASURA_ENDPOINT": config.hasuraEndpoint,
@@ -274,7 +315,7 @@ function buildVercelProdConfig(config: { hasuraEndpoint: string, adminSecret: st
       "APP_ROOT": config.appUrl,
       "NEXT_PUBLIC_APP_ROOT": config.appUrl,
       "NEXT_PUBLIC_AUTH0_DOMAIN": config.auth0Domain,
-      "NEXT_PUBLIC_AUTH0_CLIENT_ID": config.auth0ClientId,
+      "NEXT_PUBLIC_AUTH0_CLIENT_ID": config.auth0WebClientId,
     },
     "build": {
       "env": {
@@ -284,8 +325,14 @@ function buildVercelProdConfig(config: { hasuraEndpoint: string, adminSecret: st
         "APP_ROOT": config.appUrl,
         "NEXT_PUBLIC_APP_ROOT": config.appUrl,
         "NEXT_PUBLIC_AUTH0_DOMAIN": config.auth0Domain,
-        "NEXT_PUBLIC_AUTH0_CLIENT_ID": config.auth0ClientId,
+        "NEXT_PUBLIC_AUTH0_CLIENT_ID": config.auth0WebClientId,
       }
     }
   };
+
+  if (config.domainName) {
+    vercelConfig.alias = [config.domainName];
+  }
+
+  return vercelConfig;
 }
