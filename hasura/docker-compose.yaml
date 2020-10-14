@@ -6,13 +6,13 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - ./db_data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: 'password'
   graphql-engine:
     image: hasura/graphql-engine:latest
     ports:
-      - '8080:8080'
+      - '${HASURA_PORT}:8080'
     depends_on:
       - 'postgres'
     restart: always
@@ -28,5 +28,3 @@ services:
       HASURA_GRAPHQL_ADMIN_SECRET: ${ADMIN_SECRET}
       HASURA_GRAPHQL_JWT_SECRET: '{"jwk_url": "${AUTH0_URL}/.well-known/jwks.json"}'
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: 'anonymous'
-volumes:
-  db_data:
