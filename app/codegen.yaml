@@ -11,9 +11,6 @@ config:
     bigint: number
     float8: number
     json: 'Json'
-  skipTypename: true
-  enumsAsConst: true
-  nonOptionalTypename: true
   immutableTypes: true
   preResolveTypes: true
 generates:
@@ -35,6 +32,7 @@ generates:
       - 'typescript-operations'
       - 'typescript-react-apollo'
     config:
+      nonOptionalTypename: true
       apolloReactCommonImportFrom: '@apollo/client'
       avoidOptionals: true
       reactApolloVersion: 3
