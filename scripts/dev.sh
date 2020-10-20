@@ -10,7 +10,7 @@ function cleanup()
 
 trap cleanup EXIT
 
-export HASURA_PORT=8081
+export HASURA_PORT=${HASURA_PORT:-8081} 
 
 if vercel whoami 2>&1 | grep "The specified token is not valid" ; then
   vercel login
