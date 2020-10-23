@@ -12,4 +12,4 @@ export HASURA_GRAPHQL_ADMIN_SECRET=$(cat ../hanja-config.prod.json | jq -r '.adm
 # HASURA_GRAPHQL_ACTIONS_HANDLER_WEBHOOK_BASEURL=$(cat ../hanja-config.json | jq -r '.hasuraEndpoint')
 
 # Pass all the parameters
-hasura "${@:1}"
+hasura "${@:1}" --skip-update-check

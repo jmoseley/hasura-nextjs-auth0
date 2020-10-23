@@ -11,4 +11,4 @@ export HASURA_GRAPHQL_ENDPOINT=$(cat ../hanja-config.dev.json | jq -r '.hasuraBa
 export HASURA_GRAPHQL_ADMIN_SECRET=$(cat ../hanja-config.dev.json | jq -r '.adminSecret')
 
 # Pass all the parameters
-hasura "${@:1}"
+hasura "${@:1}" --skip-update-check
