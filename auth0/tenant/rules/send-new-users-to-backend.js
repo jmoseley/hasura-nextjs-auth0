@@ -26,7 +26,6 @@ mutation insertUser($auth0_id: String!, $name: String!, $email: String!) {
       body: JSON.stringify({ query: mutation, variables: { auth0_id, name, email } }),
     },
     function (error, response, body) {
-      console.log(body);
       // Check for graphql errors
       if (body.errors && body.errors.length > 0) {
         callback(new Error(`Error: ${body.errors.map((error) => error.message).join(' ')}`), user, context);
