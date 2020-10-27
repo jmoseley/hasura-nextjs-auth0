@@ -22,7 +22,7 @@
     "graphql": "^14.5.6",
     "graphql-request": "^3.0.0",
     "graphql-tag": "^2.10.1",
-    "next": "^9.5.4",
+    "next": "^10.0.0",
     "next-apollo": "^3.1.2",
     "next-server": "^9.0.5",
     "node-emoji": "^1.10.0",
@@ -35,8 +35,8 @@
   "devDependencies": {
     "@graphql-codegen/cli": "^1.17.8",
     "@graphql-codegen/fragment-matcher": "^1.17.8",
-    "@graphql-codegen/schema-ast": "^1.17.8",
     "@graphql-codegen/import-types-preset": "^1.17.9",
+    "@graphql-codegen/schema-ast": "^1.17.8",
     "@graphql-codegen/typescript": "^1.17.8",
     "@graphql-codegen/typescript-graphql-request": "^2.0.0",
     "@graphql-codegen/typescript-operations": "^1.17.8",
