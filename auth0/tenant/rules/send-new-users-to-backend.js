@@ -27,7 +27,12 @@ mutation insertUser($auth0_id: String!, $name: String!, $email: String!) {
     },
     function (error, response, body) {
       console.log(body);
-      callback(error, user, context);
+      // Check for graphql errors
+      if (body.errors && body.errors.length > 0) {
+        callback(new Error(`Error: ${body.errors.map((error) => error.message).join(' ')}`), user, context);
+      } else {
+        callback(error, user, context);
+      }
     },
   );
 }
