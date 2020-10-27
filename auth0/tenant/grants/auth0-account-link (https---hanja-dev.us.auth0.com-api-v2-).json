@@ -1,6 +1,6 @@
 {
   "client_id": "auth0-account-link",
-  "audience": "https://hanja-dev.us.auth0.com/api/v2/",
+  "audience": "##AUTH0_URL##/api/v2/",
   "scope": [
     "read:connections",
     "read:users",
