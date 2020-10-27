@@ -8,7 +8,7 @@ function userSyncRule(user, context, callback) {
   const request = require('request');
 
   const mutation = `
-mutation insertUser($auth0_id: String!, $name: String!, $email: String!) {
+mutation insertUser($auth0_id: String!, $name: String!, $email: citext!) {
   insert_users(objects: {name: $name, auth0_id: $auth0_id, email: $email}, on_conflict: {constraint: users_auth0_id_key, update_columns: [name, email]}) {
     returning {
       id
@@ -26,11 +26,19 @@ mutation insertUser($auth0_id: String!, $name: String!, $email: String!) {
       body: JSON.stringify({ query: mutation, variables: { auth0_id, name, email } }),
     },
     function (error, response, body) {
+      let parsedBody;
+      try {
+        parsedBody = JSON.parse(body);
+      } catch (e) {
+        console.warn('Body is not valid JSON.');
+        return callback(new Error(`Invalid response from server. Response not parsable.`));
+      }
       // Check for graphql errors
-      if (body.errors && body.errors.length > 0) {
-        callback(new Error(`Error: ${body.errors.map((error) => error.message).join(' ')}`), user, context);
+      if (parsedBody.errors && parsedBody.errors.length > 0) {
+        console.error(parsedBody.errors);
+        return callback(new Error(`Error: ${parsedBody.errors.map((error) => error.message).join(' ')}`));
       } else {
-        callback(error, user, context);
+        return callback(error, user, context);
       }
     },
   );
