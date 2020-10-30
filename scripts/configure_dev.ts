@@ -178,6 +178,7 @@ const main = async () => {
             AUTH0_KEYWORD_REPLACE_MAPPINGS: {
               LOGO_URL: logoUrl,
               APP_URL: appUrl,
+              AUTH0_URL: auth0Url,
               HASURA_ENDPOINT: hasuraEndpoint,
               ADMIN_SECRET: adminSecret,
               PROJECT_NAME: projectName,
